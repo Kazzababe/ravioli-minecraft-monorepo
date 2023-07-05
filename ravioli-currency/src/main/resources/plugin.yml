@@ -1,0 +1,5 @@
+name: RavioliCurrency
+main: ravioli.gravioli.currency.CurrencyPlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19
+depend: [RavioliCore]

@@ -1,0 +1,9 @@
+currencies:
+  0:
+    id: "global_dollars"
+    format:
+      format: "$<value>"
+      decimals: 2
+    display:
+      singular: "Dollar"
+      plural: "Dollars"

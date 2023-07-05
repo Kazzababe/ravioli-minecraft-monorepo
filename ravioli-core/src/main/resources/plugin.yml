@@ -1,0 +1,4 @@
+name: RavioliCore
+main: ravioli.gravioli.core.RavioliCorePlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19

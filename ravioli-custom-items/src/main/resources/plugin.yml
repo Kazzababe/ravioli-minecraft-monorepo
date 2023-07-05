@@ -1,0 +1,5 @@
+name: RavioliCustomItems
+main: ravioli.gravioli.customitem.CustomItemsPlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19
+depend: [RavioliCore]

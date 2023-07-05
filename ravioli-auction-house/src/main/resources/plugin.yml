@@ -1,0 +1,5 @@
+name: RavioliAuctionHouse
+main: ravioli.gravioli.auctionhouse.AuctionHousePlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19
+depend: [RavioliMail, RavioliCore, RavioliCustomItems, RavioliCurrency]

@@ -1,0 +1,6 @@
+name: RavioliDialogue
+main: ravioli.gravioli.dialogue.DialoguePlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19
+depend: [ProtocolLib, RavioliCore]
+softdepend: [Citizens]

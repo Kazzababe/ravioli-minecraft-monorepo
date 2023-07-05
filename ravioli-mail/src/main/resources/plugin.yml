@@ -1,0 +1,5 @@
+name: RavioliMail
+main: ravioli.gravioli.mail.MailPlugin
+version: 1.0-SNAPSHOT
+api-version: 1.19
+depend: [RavioliCore, RavioliCustomItems]

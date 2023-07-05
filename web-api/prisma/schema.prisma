@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model auction_house_item {
+  id           BigInt       @id @default(autoincrement())
+  user_id      BigInt
+  item         String
+  created_at   DateTime     @default(now())
+  expiration   DateTime
+  currency     String       @db.VarChar(64)
+  cost         Int
+  display_name String       @db.VarChar(64)
+  ravioli_user ravioli_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_auction_house_item_user_id")
+}
+
+model auction_house_sell_log {
+  user_id      BigInt                   @id @default(autoincrement())
+  item         String                   @db.VarChar(1024)
+  created_at   DateTime                 @default(now())
+  currency     String                   @db.VarChar(64)
+  cost         Int
+  tsv          Unsupported("tsvector")?
+  ravioli_user ravioli_user             @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tsv], type: Gin)
+  @@index([user_id], map: "idx_auction_house_sell_log_user_id")
+}
+
+model dialogue_state {
+  user_id  String @db.Uuid
+  dialogue String @db.VarChar(64)
+  state    Int
+
+  @@unique([user_id, dialogue])
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model friend_requests {
+  id          BigInt    @id @default(autoincrement())
+  sender_id   BigInt
+  receiver_id BigInt
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model friends {
+  id               BigInt    @id @default(autoincrement())
+  first_friend_id  BigInt
+  second_friend_id BigInt
+  created_at       DateTime? @default(now())
+}
+
+model mailbox_item {
+  id           BigInt       @id @default(autoincrement())
+  mailbox_id   BigInt
+  item         String
+  message      String?
+  opened       Boolean      @default(false)
+  type         String       @db.VarChar(32)
+  category     String       @db.VarChar(32)
+  group_id     String?      @db.VarChar(32)
+  title        String?      @db.VarChar(64)
+  created_at   DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?    @default(now()) @updatedAt @db.Timestamp(6)
+  user_mailbox user_mailbox @relation(fields: [mailbox_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quest_stages {
+  id          BigInt        @id @default(autoincrement())
+  stage_id    String        @db.VarChar(64)
+  quest_id    BigInt
+  status      quest_status? @default(ACTIVE)
+  created_at  DateTime      @default(now()) @db.Timestamp(6)
+  updated_at  DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  quests      quests        @relation(fields: [quest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quest_tasks quest_tasks[]
+
+  @@unique([quest_id, stage_id])
+}
+
+model quest_tasks {
+  id           BigInt       @id @default(autoincrement())
+  task_id      String       @db.VarChar(64)
+  stage_id     BigInt
+  progress     Float
+  quest_stages quest_stages @relation(fields: [stage_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([stage_id, task_id])
+}
+
+model quests {
+  id            BigInt          @id @default(autoincrement())
+  quest_id      String          @db.VarChar(64)
+  status        quest_status?   @default(ACTIVE)
+  user_id       BigInt?
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
+  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamp(6)
+  quest_stages  quest_stages[]
+  ravioli_user  ravioli_user?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tracked_quest tracked_quest[]
+
+  @@unique([quest_id, user_id])
+}
+
+model ravioli_user {
+  id                     BigInt                  @id @default(autoincrement())
+  uuid                   String                  @unique @db.Uuid
+  username               String                  @unique @db.VarChar(16)
+  created_at             DateTime                @default(now())
+  updated_at             DateTime                @default(now())
+  auction_house_item     auction_house_item[]
+  auction_house_sell_log auction_house_sell_log?
+  quests                 quests[]
+  tracked_quest          tracked_quest?
+  user_currency          user_currency[]
+  user_mailbox           user_mailbox[]
+}
+
+model tracked_quest {
+  user_id      BigInt       @unique
+  quest_id     BigInt
+  quests       quests       @relation(fields: [quest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ravioli_user ravioli_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_currency {
+  id           BigInt       @id @default(autoincrement())
+  user_id      BigInt
+  currency     String       @db.VarChar(32)
+  amount       Decimal      @default(0) @db.Decimal(14, 2)
+  ravioli_user ravioli_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([user_id, currency])
+}
+
+model user_mailbox {
+  id           BigInt         @id @default(autoincrement())
+  user_id      BigInt
+  type         String         @db.VarChar(32)
+  mailbox_item mailbox_item[]
+  ravioli_user ravioli_user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([user_id, type])
+}
+
+enum quest_status {
+  ACTIVE
+  COMPLETED
+}

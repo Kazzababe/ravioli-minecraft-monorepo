@@ -1,0 +1,6 @@
+vanilla-items:
+  WOODEN_SWORD:
+    displayName: "Training Sword"
+    lore:
+      - '<gray><i>〝A humble wooden sword, used by novice'
+      - '<gray><i>warriors to hone their skills.〞'

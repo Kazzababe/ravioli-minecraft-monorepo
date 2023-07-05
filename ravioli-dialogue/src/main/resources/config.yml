@@ -1,0 +1,5 @@
+dialogue-attachment:
+  0:
+    type: 'citizens-npc'
+    npc-id: 0
+    dialogue-file: 'dialogue/example.json'
